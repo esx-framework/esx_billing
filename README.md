@@ -1,4 +1,4 @@
-# esx_billing
+<h1 align='center'>[ESX] Billing</a></h1><p align='center'><b><a href='https://discord.esx-framework.org/'>Discord</a> - <a href='https://documentation.esx-framework.org/legacy/installation'>Documentation</a></b></h5>
 
 This resource for ESX adds possibility for different jobs to send bills to players, for example making police units able to give people fines. It comes with a menu for paying bills, to open the menu the default keybind is `F7`.
 
@@ -8,17 +8,17 @@ There is a developer server event available in order to register bills in the da
 
 ### Using [fvm](https://github.com/qlaffont/fvm-installer)
 ```
-fvm install --save --folder=esx esx-org/esx_billing
+fvm install --save --folder=esx esx-framework/esx_billing
 ```
 
 ### Using Git
 ```
 cd resources
-git clone https://github.com/ESX-Org/esx_billing [esx]/esx_billing
+git clone https://github.com/esx-framework/esx_billing [esx]/esx_billing
 ```
 
 ### Manually
-- Download https://github.com/ESX-Org/esx_billing/archive/master.zip
+- Download https://github.com/esx-framework/esx_billing/archive/master.zip
 - Put it in the `[esx]` directory
 
 
@@ -48,7 +48,7 @@ end
 ### License
 esx_billing - billing for ESX
 
-Copyright (C) 2015-2022 Jérémie N'gadi
+Copyright (C) 2015-2023 Jérémie N'gadi
 
 This program Is free software: you can redistribute it And/Or modify it under the terms Of the GNU General Public License As published by the Free Software Foundation, either version 3 Of the License, Or (at your option) any later version.
 
