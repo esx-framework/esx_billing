@@ -18,7 +18,7 @@ git clone https://github.com/esx-framework/esx_billing [esx]/esx_billing
 ```
 
 ### Manually
-- Download https://github.com/ESX-Org/esx_billing/archive/master.zip
+- Download https://github.com/esx-framework/esx_billing/archive/master.zip
 - Put it in the `[esx]` directory
 
 
