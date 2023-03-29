@@ -1,4 +1,4 @@
-Locales['sc'] = {
+Locales['zh-CN'] = {
   ['invoices'] = '账单',
   ['invoices_item'] = '$%s',
   ['received_invoice'] = '新增一笔~r~新的账单! 请及时支付!',
