@@ -9,5 +9,4 @@ Locales['sl'] = {
     ['no_money'] = 'nimate dovolj denarja za plačilo tega računa',
     ['target_no_money'] = 'igralec ~r~nima dovolj denarja za plačilo računa!',
     ['keymap_showbills'] = 'Odpri Položnice',
-  }
-  
+}
