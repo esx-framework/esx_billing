@@ -1,23 +1,32 @@
-RegisterServerEvent('esx_billing:sendBill')
-AddEventHandler('esx_billing:sendBill', function(playerId, sharedAccountName, label, amount)
+
+RegisterNetEvent('esx_billing:sendBill', function(playerId, sharedAccountName, label, amount)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	local xTarget = ESX.GetPlayerFromId(playerId)
 	amount = ESX.Math.Round(amount)
 
 	if amount > 0 and xTarget then
-		TriggerEvent('esx_addonaccount:getSharedAccount', sharedAccountName, function(account)
-			if account then
-				MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {xTarget.identifier, xPlayer.identifier, 'society', sharedAccountName, label, amount},
-				function(rowsChanged)
-					xTarget.showNotification(TranslateCap('received_invoice'))
-				end)
-			else
-				MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {xTarget.identifier, xPlayer.identifier, 'player', xPlayer.identifier, label, amount},
-				function(rowsChanged)
-					xTarget.showNotification(TranslateCap('received_invoice'))
-				end)
+		if string.match(sharedAccountName, "society_") then
+			local jobname = sharedAccountName:gsub("society_")
+			if xPlayer.job.name ~= jobname then
+				print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from a society (^5%s^7), but does not have the correct Job - Possibly Cheats"):format(xPlayer.source, sharedAccountName))
+				return
 			end
-		end)
+			TriggerEvent('esx_addonaccount:getSharedAccount', sharedAccountName, function(account)
+				if account then
+					MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {xTarget.identifier, xPlayer.identifier, 'society', sharedAccountName, label, amount},
+					function(rowsChanged)
+						xTarget.showNotification(TranslateCap('received_invoice'))
+					end)
+				else
+					print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from invalid society - ^5%s^7"):format(xPlayer.source, sharedAccountName))
+				end
+			end)
+		else
+			MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {xTarget.identifier, xPlayer.identifier, 'player', xPlayer.identifier, label, amount},
+			function(rowsChanged)
+				xTarget.showNotification(TranslateCap('received_invoice'))
+			end)
+		end
 	end
 end)
 
