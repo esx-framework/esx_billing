@@ -6,7 +6,7 @@ RegisterNetEvent('esx_billing:sendBill', function(playerId, sharedAccountName, l
 
 	if amount > 0 and xTarget then
 		if string.match(sharedAccountName, "society_") then
-			local jobname = sharedAccountName:gsub("society_")
+			local jobname = string.gsub(sharedAccountName, 'society_', '')
 			if xPlayer.job.name ~= jobname then
 				print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from a society (^5%s^7), but does not have the correct Job - Possibly Cheats"):format(xPlayer.source, sharedAccountName))
 				return
