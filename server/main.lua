@@ -1,4 +1,3 @@
-
 RegisterNetEvent('esx_billing:sendBill', function(playerId, sharedAccountName, label, amount)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	local xTarget = ESX.GetPlayerFromId(playerId)
@@ -12,13 +11,28 @@ RegisterNetEvent('esx_billing:sendBill', function(playerId, sharedAccountName, l
 				return
 			end
 			TriggerEvent('esx_addonaccount:getSharedAccount', sharedAccountName, function(account)
-				if account then
-					MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {xTarget.identifier, xPlayer.identifier, 'society', sharedAccountName, label, amount},
-					function(rowsChanged)
-						xTarget.showNotification(TranslateCap('received_invoice'))
-					end)
+				if Config.EnableAutoPay and Config.AutoPaySocieties[sharedAccountName] then
+					if xTarget.getMoney() >= amount then
+						xTarget.removeMoney(amount)
+					elseif xTarget.getAccount('bank').money >= amount then
+						xTarget.removeAccountMoney('bank', amount)
+					else
+						xPlayer.showNotification(TranslateCap('target_no_money'))
+						xTarget.showNotification(TranslateCap('no_money'))
+						return
+					end
+					account.addMoney(amount)
+					xTarget.showNotification(TranslateCap('paid_invoice', ESX.Math.GroupDigits(amount)))
+					xPlayer.showNotification(TranslateCap('received_payment', ESX.Math.GroupDigits(amount)))
 				else
-					print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from invalid society - ^5%s^7"):format(xPlayer.source, sharedAccountName))
+					if account then
+						MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {xTarget.identifier, xPlayer.identifier, 'society', sharedAccountName, label, amount},
+						function(rowsChanged)
+							xTarget.showNotification(TranslateCap('received_invoice'))
+						end)
+					else
+						print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from invalid society - ^5%s^7"):format(xPlayer.source, sharedAccountName))
+					end
 				end
 			end)
 		else
@@ -29,6 +43,7 @@ RegisterNetEvent('esx_billing:sendBill', function(playerId, sharedAccountName, l
 		end
 	end
 end)
+
 
 ESX.RegisterServerCallback('esx_billing:getBills', function(source, cb)
 	local xPlayer = ESX.GetPlayerFromId(source)
