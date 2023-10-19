@@ -1,4 +1,3 @@
-
 RegisterNetEvent('esx_billing:sendBill', function(playerId, sharedAccountName, label, amount)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	local xTarget = ESX.GetPlayerFromId(playerId)
@@ -11,25 +10,21 @@ RegisterNetEvent('esx_billing:sendBill', function(playerId, sharedAccountName, l
 				print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from a society (^5%s^7), but does not have the correct Job - Possibly Cheats"):format(xPlayer.source, sharedAccountName))
 				return
 			end
-			if Config.EnableAutoPay and Config.AutoPaySocieties[sharedAccountName] then
-				TriggerEvent('esx_addonaccount:getSharedAccount', sharedAccountName, function(account)
+			TriggerEvent('esx_addonaccount:getSharedAccount', sharedAccountName, function(account)
+				if Config.EnableAutoPay and Config.AutoPaySocieties[sharedAccountName] then
 					if xTarget.getMoney() >= amount then
-						xTarget.removeMoney(amount, "Bill Paid")
-						account.addMoney(amount)
-						xTarget.showNotification(TranslateCap('paid_invoice', ESX.Math.GroupDigits(amount)))
-						xPlayer.showNotification(TranslateCap('received_payment', ESX.Math.GroupDigits(amount)))
+						xTarget.removeMoney(amount)
 					elseif xTarget.getAccount('bank').money >= amount then
-						xTarget.removeAccountMoney('bank', amount, "Bill Paid")
-						account.addMoney(amount)
-						xTarget.showNotification(TranslateCap('paid_invoice', ESX.Math.GroupDigits(amount)))
-						xPlayer.showNotification(TranslateCap('received_payment', ESX.Math.GroupDigits(amount)))
+						xTarget.removeAccountMoney('bank', amount)
 					else
 						xPlayer.showNotification(TranslateCap('target_no_money'))
 						xTarget.showNotification(TranslateCap('no_money'))
+						return
 					end
-				end)
-			else
-				TriggerEvent('esx_addonaccount:getSharedAccount', sharedAccountName, function(account)
+					account.addMoney(amount)
+					xTarget.showNotification(TranslateCap('paid_invoice', ESX.Math.GroupDigits(amount)))
+					xPlayer.showNotification(TranslateCap('received_payment', ESX.Math.GroupDigits(amount)))
+				else
 					if account then
 						MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {xTarget.identifier, xPlayer.identifier, 'society', sharedAccountName, label, amount},
 						function(rowsChanged)
@@ -38,8 +33,8 @@ RegisterNetEvent('esx_billing:sendBill', function(playerId, sharedAccountName, l
 					else
 						print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from invalid society - ^5%s^7"):format(xPlayer.source, sharedAccountName))
 					end
-				end)
-			end
+				end
+			end)
 		else
 			MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {xTarget.identifier, xPlayer.identifier, 'player', xPlayer.identifier, label, amount},
 			function(rowsChanged)
@@ -48,6 +43,7 @@ RegisterNetEvent('esx_billing:sendBill', function(playerId, sharedAccountName, l
 		end
 	end
 end)
+
 
 ESX.RegisterServerCallback('esx_billing:getBills', function(source, cb)
 	local xPlayer = ESX.GetPlayerFromId(source)
