@@ -36,11 +36,46 @@ RegisterNetEvent('esx_billing:sendBill', function(targetId, sharedAccountName, l
 end)
 exports("BillPlayer", BillPlayer)
 
-function BillPlayerByIdentifier(playerIdentifier, sharedAccountName, label, amount)
+function BillPlayerByIdentifier(targetIdentifier, senderIdentifier, sharedAccountName, label, amount)
+	local xTarget = ESX.GetPlayerFromIdentifier(targetIdentifier)
+	amount = ESX.Math.Round(amount)
 
+	if amount > 0 then
+		if string.match(sharedAccountName, "society_") then
+			TriggerEvent('esx_addonaccount:getSharedAccount', sharedAccountName, function(account)
+				if account then
+					MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {targetIdentifier, senderIdentifier, 'society', sharedAccountName, label, amount},
+					function(rowsChanged)
+						if xTarget then
+							xTarget.showNotification(TranslateCap('received_invoice'))
+						end
+					end)
+				else
+					print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from invalid society - ^5%s^7"):format(senderIdentifier, sharedAccountName))
+				end
+			end)
+		else
+			MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {targetIdentifier, senderIdentifier, 'player', senderIdentifier, label, amount},
+			function(rowsChanged)
+				if xTarget then
+					xTarget.showNotification(TranslateCap('received_invoice'))
+				end
+			end)
+		end
+	end
 end
 
-RegisterNetEvent('esx_billing:sendBillToIdentifier', BillPlayerByIdentifier)
+RegisterNetEvent('esx_billing:sendBillToIdentifier', function(targetIdentifier, sharedAccountName, label, amount)
+	local xPlayer = ESX.GetPlayerFromId(source)
+	local jobName = string.gsub(sharedAccountName, 'society_', '')
+
+	if xPlayer.job.name ~= jobName then
+		print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from a society (^5%s^7), but does not have the correct Job - Possibly Cheats"):format(xPlayer.source, sharedAccountName))
+		return
+	end
+
+	BillPlayerByIdentifier(targetIdentifier, xPlayer.identifier, sharedAccountName, label, amount)
+end)
 exports("BillPlayerByIdentifier", BillPlayerByIdentifier)
 
 
