@@ -1,41 +1,3 @@
-function BillPlayer(targetId, senderIdentifier, sharedAccountName, label, amount)
-	local xTarget = ESX.GetPlayerFromId(targetId)
-	amount = ESX.Math.Round(amount)
-
-	if amount > 0 and xTarget then
-		if string.match(sharedAccountName, "society_") then
-			TriggerEvent('esx_addonaccount:getSharedAccount', sharedAccountName, function(account)
-				if account then
-					MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {xTarget.identifier, senderIdentifier, 'society', sharedAccountName, label, amount},
-					function(rowsChanged)
-						xTarget.showNotification(TranslateCap('received_invoice'))
-					end)
-				else
-					print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from invalid society - ^5%s^7"):format(senderIdentifier, sharedAccountName))
-				end
-			end)
-		else
-			MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {xTarget.identifier, senderIdentifier, 'player', senderIdentifier, label, amount},
-			function(rowsChanged)
-				xTarget.showNotification(TranslateCap('received_invoice'))
-			end)
-		end
-	end
-end
-
-RegisterNetEvent('esx_billing:sendBill', function(targetId, sharedAccountName, label, amount)
-	local xPlayer = ESX.GetPlayerFromId(source)
-	local jobName = string.gsub(sharedAccountName, 'society_', '')
-
-	if xPlayer.job.name ~= jobName then
-		print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from a society (^5%s^7), but does not have the correct Job - Possibly Cheats"):format(xPlayer.source, sharedAccountName))
-		return
-	end
-
-	SendBill(targetId, xPlayer.identifier, sharedAccountName, label, amount)
-end)
-exports("BillPlayer", BillPlayer)
-
 function BillPlayerByIdentifier(targetIdentifier, senderIdentifier, sharedAccountName, label, amount)
 	local xTarget = ESX.GetPlayerFromIdentifier(targetIdentifier)
 	amount = ESX.Math.Round(amount)
@@ -64,6 +26,27 @@ function BillPlayerByIdentifier(targetIdentifier, senderIdentifier, sharedAccoun
 		end
 	end
 end
+
+function BillPlayer(targetId, senderIdentiier, sharedAccountName, label, amount)
+	local xTarget = ESX.GetPlayerFromId(targetId)
+
+	if xTarget then
+		BillPlayerByIdentifier(xTarget.identifier, senderIdentiier, sharedAccountName, label, amount)
+	end
+end
+
+RegisterNetEvent('esx_billing:sendBill', function(targetId, sharedAccountName, label, amount)
+	local xPlayer = ESX.GetPlayerFromId(source)
+	local jobName = string.gsub(sharedAccountName, 'society_', '')
+
+	if xPlayer.job.name ~= jobName then
+		print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from a society (^5%s^7), but does not have the correct Job - Possibly Cheats"):format(xPlayer.source, sharedAccountName))
+		return
+	end
+
+	BillPlayer(targetId, xPlayer.identifier, sharedAccountName, label, amount)
+end)
+exports("BillPlayer", BillPlayer)
 
 RegisterNetEvent('esx_billing:sendBillToIdentifier', function(targetIdentifier, sharedAccountName, label, amount)
 	local xPlayer = ESX.GetPlayerFromId(source)
