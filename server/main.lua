@@ -27,11 +27,11 @@ function BillPlayerByIdentifier(targetIdentifier, senderIdentifier, sharedAccoun
 	end
 end
 
-function BillPlayer(targetId, senderIdentiier, sharedAccountName, label, amount)
+function BillPlayer(targetId, senderIdentifier, sharedAccountName, label, amount)
 	local xTarget = ESX.GetPlayerFromId(targetId)
 
 	if xTarget then
-		BillPlayerByIdentifier(xTarget.identifier, senderIdentiier, sharedAccountName, label, amount)
+		BillPlayerByIdentifier(xTarget.identifier, senderIdentifier, sharedAccountName, label, amount)
 	end
 end
 
