@@ -8,9 +8,11 @@ function BillPlayerByIdentifier(targetIdentifier, senderIdentifier, sharedAccoun
 				if account then
 					MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {targetIdentifier, senderIdentifier, 'society', sharedAccountName, label, amount},
 					function(rowsChanged)
-						if xTarget then
-							xTarget.showNotification(TranslateCap('received_invoice'))
+						if not xTarget then
+							return
 						end
+
+						xTarget.showNotification(TranslateCap('received_invoice'))
 					end)
 				else
 					print(("[^2ERROR^7] Player ^5%s^7 Attempted to Send bill from invalid society - ^5%s^7"):format(senderIdentifier, sharedAccountName))
@@ -19,9 +21,11 @@ function BillPlayerByIdentifier(targetIdentifier, senderIdentifier, sharedAccoun
 		else
 			MySQL.insert('INSERT INTO billing (identifier, sender, target_type, target, label, amount) VALUES (?, ?, ?, ?, ?, ?)', {targetIdentifier, senderIdentifier, 'player', senderIdentifier, label, amount},
 			function(rowsChanged)
-				if xTarget then
-					xTarget.showNotification(TranslateCap('received_invoice'))
+				if not xTarget then
+					return
 				end
+
+				xTarget.showNotification(TranslateCap('received_invoice'))
 			end)
 		end
 	end
@@ -30,9 +34,11 @@ end
 function BillPlayer(targetId, senderIdentifier, sharedAccountName, label, amount)
 	local xTarget = ESX.GetPlayerFromId(targetId)
 
-	if xTarget then
-		BillPlayerByIdentifier(xTarget.identifier, senderIdentifier, sharedAccountName, label, amount)
+	if not xTarget then
+		return
 	end
+
+	BillPlayerByIdentifier(xTarget.identifier, senderIdentifier, sharedAccountName, label, amount)
 end
 
 RegisterNetEvent('esx_billing:sendBill', function(targetId, sharedAccountName, label, amount)
