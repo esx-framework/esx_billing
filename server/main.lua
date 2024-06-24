@@ -107,12 +107,13 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 							if rowsChanged == 1 then
 								xPlayer.removeMoney(amount, "Bill Paid")
 								xTarget.addMoney(amount, "Paid bill")
-
+								TriggerEvent("esx_billing:paidBill", source, billId)
 								xPlayer.showNotification(TranslateCap('paid_invoice', ESX.Math.GroupDigits(amount)))
 								xTarget.showNotification(TranslateCap('received_payment', ESX.Math.GroupDigits(amount)))
+								cb(true)
+							else
+								cb(nil)
 							end
-
-							cb()
 						end)
 					elseif xPlayer.getAccount('bank').money >= amount then
 						MySQL.update('DELETE FROM billing WHERE id = ?', {billId},
@@ -120,21 +121,22 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 							if rowsChanged == 1 then
 								xPlayer.removeAccountMoney('bank', amount, "Bill Paid")
 								xTarget.addAccountMoney('bank', amount, "Paid bill")
-
+								TriggerEvent("esx_billing:paidBill", source, billId)
 								xPlayer.showNotification(TranslateCap('paid_invoice', ESX.Math.GroupDigits(amount)))
 								xTarget.showNotification(TranslateCap('received_payment', ESX.Math.GroupDigits(amount)))
+								cb(true)
+							else
+								cb(nil)
 							end
-
-							cb()
 						end)
 					else
 						xTarget.showNotification(TranslateCap('target_no_money'))
 						xPlayer.showNotification(TranslateCap('no_money'))
-						cb()
+						cb(nil)
 					end
 				else
 					xPlayer.showNotification(TranslateCap('player_not_online'))
-					cb()
+					cb(nil)
 				end
 			else
 				TriggerEvent('esx_addonaccount:getSharedAccount', result.target, function(account)
@@ -144,14 +146,15 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 							if rowsChanged == 1 then
 								xPlayer.removeMoney(amount, "Bill Paid")
 								account.addMoney(amount)
-
+								TriggerEvent("esx_billing:paidBill", source, billId)
 								xPlayer.showNotification(TranslateCap('paid_invoice', ESX.Math.GroupDigits(amount)))
 								if xTarget then
 									xTarget.showNotification(TranslateCap('received_payment', ESX.Math.GroupDigits(amount)))
 								end
+								cb(true)
+							else
+								cb(nil)
 							end
-
-							cb()
 						end)
 					elseif xPlayer.getAccount('bank').money >= amount then
 						MySQL.update('DELETE FROM billing WHERE id = ?', {billId},
@@ -160,13 +163,14 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 								xPlayer.removeAccountMoney('bank', amount, "Bill Paid")
 								account.addMoney(amount)
 								xPlayer.showNotification(TranslateCap('paid_invoice', ESX.Math.GroupDigits(amount)))
-
+								TriggerEvent("esx_billing:paidBill", source, billId)
 								if xTarget then
 									xTarget.showNotification(TranslateCap('received_payment', ESX.Math.GroupDigits(amount)))
 								end
+								cb(true)
+							else
+								cb(nil)
 							end
-
-							cb()
 						end)
 					else
 						if xTarget then
@@ -174,7 +178,7 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 						end
 
 						xPlayer.showNotification(TranslateCap('no_money'))
-						cb()
+						cb(nil)
 					end
 				end)
 			end
