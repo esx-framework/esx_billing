@@ -112,7 +112,7 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 								xTarget.showNotification(TranslateCap('received_payment', ESX.Math.GroupDigits(amount)))
 								cb(true)
 							else
-								cb(false)
+								cb(nil)
 							end
 						end)
 					elseif xPlayer.getAccount('bank').money >= amount then
@@ -126,17 +126,17 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 								xTarget.showNotification(TranslateCap('received_payment', ESX.Math.GroupDigits(amount)))
 								cb(true)
 							else
-								cb(false)
+								cb(nil)
 							end
 						end)
 					else
 						xTarget.showNotification(TranslateCap('target_no_money'))
 						xPlayer.showNotification(TranslateCap('no_money'))
-						cb(false)
+						cb(nil)
 					end
 				else
 					xPlayer.showNotification(TranslateCap('player_not_online'))
-					cb(false)
+					cb(nil)
 				end
 			else
 				TriggerEvent('esx_addonaccount:getSharedAccount', result.target, function(account)
@@ -153,7 +153,7 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 								end
 								cb(true)
 							else
-								cb(false)
+								cb(nil)
 							end
 						end)
 					elseif xPlayer.getAccount('bank').money >= amount then
@@ -169,7 +169,7 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 								end
 								cb(true)
 							else
-								cb(false)
+								cb(nil)
 							end
 						end)
 					else
@@ -178,7 +178,7 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 						end
 
 						xPlayer.showNotification(TranslateCap('no_money'))
-						cb(false)
+						cb(nil)
 					end
 				end)
 			end
