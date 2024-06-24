@@ -19,11 +19,12 @@ function ShowBillsMenu()
 				local billId = element.billId
 
 				ESX.TriggerServerCallback('esx_billing:payBill', function(resp)
-					if resp == true then
-						TriggerEvent("esx_billing:paidBill", billId)
-					end
-
 					ShowBillsMenu()
+
+					if not resp then
+						return
+					end
+					TriggerEvent("esx_billing:paidBill", billId)
 				end, billId)
 			end)
 		else
