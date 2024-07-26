@@ -147,7 +147,3 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 		cb(true)
 	end)
 end)
-
-RegisterCommand('testBill', function(source, args, raw)
-	billPlayer(1, ESX.GetPlayerFromId(source).identifier, 'society_police', 'Test Bill', 100)
-end)
