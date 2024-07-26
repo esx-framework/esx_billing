@@ -92,7 +92,7 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 	if result.target_type == 'player' then
 		if not xTarget then
 			xPlayer.showNotification(TranslateCap('player_not_online'))
-			return cb(false)
+			return cb()
 		end
 
 		local paymentAccount = 'money'
@@ -101,12 +101,12 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 			if xPlayer.getAccount('bank').money < amount then
 				xTarget.showNotification(TranslateCap('target_no_money'))
 				xPlayer.showNotification(TranslateCap('no_money'))
-				return cb(false)
+				return cb()
 			end
 		end
 
 		local rowsChanged = MySQL.update.await('DELETE FROM billing WHERE id = ?', { billId })
-		if rowsChanged ~= 1 then return cb(false) end
+		if rowsChanged ~= 1 then return cb() end
 
 		xPlayer.removeAccountMoney(paymentAccount, amount, "Bill Paid")
 		xTarget.addAccountMoney(paymentAccount, amount, "Paid bill")
@@ -125,12 +125,12 @@ ESX.RegisterServerCallback('esx_billing:payBill', function(source, cb, billId)
 			if xPlayer.getAccount('bank').money < amount then
 				xTarget.showNotification(TranslateCap('target_no_money'))
 				xPlayer.showNotification(TranslateCap('no_money'))
-				return cb(false)
+				return cb()
 			end
 		end
 
 		local rowsChanged = MySQL.update.await('DELETE FROM billing WHERE id = ?', { billId })
-		if rowsChanged ~= 1 then return cb(false) end
+		if rowsChanged ~= 1 then return cb() end
 
 		xPlayer.removeAccountMoney(paymentAccount, amount, "Bill Paid")
 		account.addMoney(amount)
